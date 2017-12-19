@@ -11,6 +11,8 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var userMessageDB = {};
+
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -38,26 +40,29 @@ var requestHandler = function(request, response) {
   };
   // See the note below about CORS h6eaders.
   var headers = defaultCorsHeaders;
-
+  var {method, url} = request;
   // Tell the client we are sending them plain text.
-  //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'application/json';
-  // headers['Content-Type'] = 'text/json';
-  // console.log('request.url ', request);
+
+  //=========================================================
+  // Working Code below
+  //=========================================================
+  // headers['Content-Type'] = 'application/json';
+  // // headers['Content-Type'] = 'text/json';
+  // // console.log('request.url ', request);
   
-  var statusCode = 200;
-  if (request.method === 'POST') {
-    statusCode = 201;
-  }
-  if (request.url !== '/classes/messages') {
-    statusCode = 404;
-  }
+  // var statusCode = 200;
+  // if (request.method === 'POST') {
+  //   statusCode = 201;
+  // }
+  // if (request.url !== '/classes/messages') {
+  //   statusCode = 404;
+  // }
   
   
-  response.writeHead(statusCode, headers);
-  
+  // response.writeHead(statusCode, headers);
+  //============================================================
 
   
    
@@ -71,9 +76,63 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
+  //=================================================================
+  // End of working code solution
+  // response.end(JSON.stringify({results: ['Hello World!', 'Hi']}));
+  //==================================================================
+  var headers = defaultCorsHeaders;
+  var {method, url} = request;
+  let body = '';
+  console.log('url ', url);
+  var validUrlPath = {
+    '/classes/messages' : '/classes/messages',
+     // '/classes/room': '/classes/room'                
+  };
   
-  response.end(JSON.stringify({results: ['Hello World!', 'Hi']}));
+  
+  if (method === 'POST') {
+    request.on('error', (err) => {
+       console.log(err);
+    });
+    request.on('data', (bufferedChunks) => {
+      body += bufferedChunks;
+    });
+    request.on('end', () => {
+      console.log('body before toString ', body);
+      body = body.toString();
+      if (validUrlPath[url]) {
+        if (!userMessageDB[url]) {
+          userMessageDB[url] = [JSON.parse(body)];
+        } else {
+          console.log('userMessageDB ', userMessageDB);
+          userMessageDB[url].push(body);
+        }
+      }
 
+      console.log('body ', body);
+    });  
+  } else if (method === 'GET') {
+      if (userMessageDB[url]) {
+        body = userMessageDB[url];//body.concat();
+      } else {
+        body = ["Hello World GET"];  
+      }
+      
+  } 
+  //now write the response object
+  //set status code and headers
+  var statusCode = 200;
+  headers['Content-Type'] = 'application/json';
+  if (!validUrlPath[url]) {
+    statusCode = 404;
+    response.writeHead(statusCode,headers);
+    response.end(JSON.stringify({}));
+  } else if (method === 'POST') {
+    statusCode = 201;
+  }
+  
+  response.writeHead(statusCode, headers);
+  response.end(JSON.stringify({results : body}));
 };
 
 

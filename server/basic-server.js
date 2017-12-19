@@ -2,8 +2,6 @@
 var http = require('http');
 var handler = require('./request-handler.js');
 
-// var {request} = require('./request-handler.js');
-
 
 // console.log('handleRequest', handleRequest);
 // Every server needs to listen on a port with a unique number. The
@@ -45,4 +43,3 @@ server.listen(port, ip);
 // server.listen() will continue running as long as there is the
 // possibility of serving more requests. To stop your server, hit
 // Ctrl-C on the command line.
-
