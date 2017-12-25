@@ -1,4 +1,4 @@
-var {sendResponse, collectData} = require('./utils');
+var utils = require('./utils');
 
 var objectId = 1;
 var messages = [
@@ -11,20 +11,20 @@ var messages = [
 
 var actions = {
   'GET' : function(request,response) {
-    sendResponse(response, {request: messages}, 200);
+    utils.sendResponse(response, {request: messages}, 200);
   },
 
   'POST': function(request,response) {
-    collectData(request, function(message) {//chatterbox sends a message that a user has typed in
+    utils.collectData(request, function(message) {//chatterbox sends a message that a user has typed in
       message.objectId = ++objectId;
       messages.push(message);
-      sendResponse(response, null, 201);//move in sendResponse inside the collectData or the response wil be sent
+      utils.sendResponse(response, null, 201);//move in sendResponse inside the collectData or the response wil be sent
       // to the client before all of the data has been collected off of the request object
     });
   },
 
   'OPTIONS': function(request, response) {
-    sendResponse(response, null, 200);
+    utils.sendResponse(response, null, 200);
   }
 };
 
@@ -34,7 +34,7 @@ exports.requestHandler = function(request, response) {
   if (action) {//will not be undefined, call the appropriate handler for the request method
     action(request, response);    
   } else {
-    sendResponse(response, 'Not Found', 404);
+    utils.sendResponse(response, 'Not Found', 404);
   }
   
 };
