@@ -14,7 +14,7 @@ exports.sendResponse = function(response, data,statusCode) {
 //have a special method that will handle post requests
 //which give you data to save on the server
 //so we need to collect data off of the request
-var collectData = function(request) {
+exports.collectData = function(request) {
   var data = '';
   request.on('data', function(chunk) {
     data += chunk;
