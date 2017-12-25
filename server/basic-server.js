@@ -1,6 +1,9 @@
 /* Import node's http module: */
 var http = require('http');
-var handler = require('./request-handler.js');
+var {requestHandler, sendResponse} = require('./request-handler');
+var urlParser = require('url');
+var {sendResponse} = require('./utils');
+// console.log('handler ', requestHandler);
 
 
 // console.log('handleRequest', handleRequest);
@@ -16,7 +19,10 @@ var port = 3000;
 // special address that always refers to localhost.
 var ip = '127.0.0.1';
 
-
+var routers = 
+{
+  
+};
 
 // We use node's http module to create a server.
 //s
@@ -24,7 +30,15 @@ var ip = '127.0.0.1';
 // incoming requests.
 //
 // After creating the server, we will tell it to listen on the given port and IP. */
-var server = http.createServer(handler.requestHandler);
+var server = http.createServer(function(request, response) {
+	// console.log('Serving request type ' + request.method + ' for url ' + request.url);
+	var route = urlParser.parse(request.url).pathname;
+	if (route === '/classes/chatterbox') {
+	  requestHandler(request, response);
+	} else {
+	  sendResponse(response, null, 404);
+	}
+});
 console.log('Listening on http://' + ip + ':' + port);
 // console.log('request ', request);
 // console.log('request:', request); 

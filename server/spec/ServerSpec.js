@@ -49,14 +49,14 @@ describe('Node Server Request Listener Function', function() {
     var res = new stubs.response();
 
     handler.requestHandler(req, res);
-
+    
     var parsedBody = JSON.parse(res._data);
     expect(parsedBody).to.have.property('results');
     expect(parsedBody.results).to.be.an('array');
     expect(res._ended).to.equal(true);
   });
 
-  it('Should accept posts to /classes/room', function() {
+  it('Should accept posts to /classes/messages', function() {
     var stubMsg = {
       username: 'Jono',
       message: 'Do my bidding!'
